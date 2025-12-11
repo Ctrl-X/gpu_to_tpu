@@ -27,5 +27,6 @@ export interface Template {
   tips: string[];
   filename: string;
   language: string;
-  diffRows: DiffRow[];
+  gpuCode: string;
+  tpuCode: string;
 }
