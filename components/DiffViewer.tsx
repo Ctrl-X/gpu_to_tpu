@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileCode, Lightbulb } from 'lucide-react';
-import { DiffRow, DiffType } from '../types';
+import { DiffRow, DiffType, DiffLine } from '../types';
 
 interface DiffViewerProps {
   rows: DiffRow[];
@@ -27,6 +27,13 @@ const LineNumber = ({ num }: { num: number | null }) => (
 const CodeContent = ({ content, type }: { content: string; type: DiffType }) => (
   <div className={`flex-1 pl-4 pr-2 font-mono text-xs leading-6 whitespace-pre ${type === 'added' ? 'text-green-900' : type === 'removed' ? 'text-red-900' : 'text-gray-800'}`}>
     {type === 'empty' ? '\u00A0' : content}
+  </div>
+);
+
+const DiffSideRow: React.FC<{ line: DiffLine }> = ({ line }) => (
+  <div className={`flex min-w-max ${getBgColor(line.type)}`}>
+     <LineNumber num={line.lineNumber} />
+     <CodeContent content={line.content} type={line.type} />
   </div>
 );
 
@@ -70,40 +77,37 @@ const DiffViewer: React.FC<DiffViewerProps> = ({ rows, filename, tips }) => {
         </div>
       </div>
 
-      {/* Diff Table */}
-      <div className="border border-gray-200 rounded-b-lg overflow-hidden bg-white shadow-sm flex flex-col">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-auto">
-            <colgroup>
-              <col className="w-1/2" />
-              <col className="w-1/2" />
-            </colgroup>
-            <thead>
-              <tr className="bg-gray-50 divide-x divide-gray-200">
-                <th className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider">GPU Implementation</th>
-                <th className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider">TPU Implementation</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {rows.map((row, idx) => (
-                <tr key={idx} className="divide-x divide-gray-200">
-                  <td className={`p-0 align-top ${getBgColor(row.left.type)}`}>
-                    <div className="flex min-w-max h-full">
-                      <LineNumber num={row.left.lineNumber} />
-                      <CodeContent content={row.left.content} type={row.left.type} />
-                    </div>
-                  </td>
-                  <td className={`p-0 align-top ${getBgColor(row.right.type)}`}>
-                    <div className="flex min-w-max h-full">
-                      <LineNumber num={row.right.lineNumber} />
-                      <CodeContent content={row.right.content} type={row.right.type} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Diff View Split Container */}
+      <div className="border border-gray-200 rounded-b-lg overflow-hidden bg-white shadow-sm flex flex-row">
+        
+        {/* Left Column (GPU) */}
+        <div className="w-1/2 flex flex-col min-w-0 border-r border-gray-200">
+           <div className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider bg-gray-50 border-b border-gray-200 flex-shrink-0">
+             GPU Implementation
+           </div>
+           <div className="overflow-x-auto">
+             <div className="divide-y divide-gray-100">
+               {rows.map((row, idx) => (
+                 <DiffSideRow key={`left-${idx}`} line={row.left} />
+               ))}
+             </div>
+           </div>
         </div>
+
+        {/* Right Column (TPU) */}
+        <div className="w-1/2 flex flex-col min-w-0">
+           <div className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider bg-gray-50 border-b border-gray-200 flex-shrink-0">
+             TPU Implementation
+           </div>
+           <div className="overflow-x-auto">
+             <div className="divide-y divide-gray-100">
+               {rows.map((row, idx) => (
+                 <DiffSideRow key={`right-${idx}`} line={row.right} />
+               ))}
+             </div>
+           </div>
+        </div>
+
       </div>
     </div>
   );
