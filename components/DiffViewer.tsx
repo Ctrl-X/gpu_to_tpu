@@ -86,7 +86,7 @@ const DiffViewer: React.FC<DiffViewerProps> = ({ rows, filename, tips }) => {
              GPU Implementation
            </div>
            <div className="overflow-x-auto">
-             <div className="divide-y divide-gray-100">
+             <div>
                {rows.map((row, idx) => (
                  <DiffSideRow key={`left-${idx}`} line={row.left} />
                ))}
@@ -100,7 +100,7 @@ const DiffViewer: React.FC<DiffViewerProps> = ({ rows, filename, tips }) => {
              TPU Implementation
            </div>
            <div className="overflow-x-auto">
-             <div className="divide-y divide-gray-100">
+             <div>
                {rows.map((row, idx) => (
                  <DiffSideRow key={`right-${idx}`} line={row.right} />
                ))}
