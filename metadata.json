@@ -1,0 +1,5 @@
+{
+  "name": "GPU to TPU Migration Assistant",
+  "description": "A developer tool to assess workload migration effort from GPU to TPU with code diffs and cost estimation.",
+  "requestFramePermissions": []
+}
