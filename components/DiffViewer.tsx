@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileCode, FileDiff, Lightbulb } from 'lucide-react';
+import { FileCode, Lightbulb } from 'lucide-react';
 import { DiffRow, DiffType } from '../types';
 
 interface DiffViewerProps {
@@ -18,16 +18,14 @@ const getBgColor = (type: DiffType) => {
   }
 };
 
-// Helper for line number styles
 const LineNumber = ({ num }: { num: number | null }) => (
-  <div className="w-10 pr-3 text-right text-gray-400 select-none text-xs leading-6 font-mono border-r border-gray-200">
+  <div className="w-10 pr-3 text-right text-gray-400 select-none text-xs leading-6 font-mono border-r border-gray-200 flex-shrink-0">
     {num || ''}
   </div>
 );
 
-// Helper for code line content
-const CodeLine = ({ content, type }: { content: string; type: DiffType }) => (
-  <div className={`flex-1 pl-4 pr-2 font-mono text-xs leading-6 whitespace-pre overflow-x-auto ${type === 'added' ? 'text-green-900' : type === 'removed' ? 'text-red-900' : 'text-gray-800'}`}>
+const CodeContent = ({ content, type }: { content: string; type: DiffType }) => (
+  <div className={`flex-1 pl-4 pr-2 font-mono text-xs leading-6 whitespace-pre ${type === 'added' ? 'text-green-900' : type === 'removed' ? 'text-red-900' : 'text-gray-800'}`}>
     {type === 'empty' ? '\u00A0' : content}
   </div>
 );
@@ -73,32 +71,38 @@ const DiffViewer: React.FC<DiffViewerProps> = ({ rows, filename, tips }) => {
       </div>
 
       {/* Diff Table */}
-      <div className="border border-gray-200 rounded-b-lg overflow-hidden bg-white shadow-sm">
-        <div className="grid grid-cols-2 divide-x divide-gray-200 bg-gray-50 border-b border-gray-200">
-            <div className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider">GPU Implementation</div>
-            <div className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider">TPU Implementation</div>
-        </div>
-        
+      <div className="border border-gray-200 rounded-b-lg overflow-hidden bg-white shadow-sm flex flex-col">
         <div className="overflow-x-auto">
-          <div className="min-w-[800px]"> {/* Ensure min width for readability on small screens */}
-            {rows.map((row, idx) => (
-              <div key={idx} className="grid grid-cols-2 divide-x divide-gray-200">
-                
-                {/* Left Side (GPU) */}
-                <div className={`flex flex-row ${getBgColor(row.left.type)}`}>
-                  <LineNumber num={row.left.lineNumber} />
-                  <CodeLine content={row.left.content} type={row.left.type} />
-                </div>
-
-                {/* Right Side (TPU) */}
-                <div className={`flex flex-row ${getBgColor(row.right.type)}`}>
-                  <LineNumber num={row.right.lineNumber} />
-                  <CodeLine content={row.right.content} type={row.right.type} />
-                </div>
-
-              </div>
-            ))}
-          </div>
+          <table className="min-w-full divide-y divide-gray-200 table-auto">
+            <colgroup>
+              <col className="w-1/2" />
+              <col className="w-1/2" />
+            </colgroup>
+            <thead>
+              <tr className="bg-gray-50 divide-x divide-gray-200">
+                <th className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider">GPU Implementation</th>
+                <th className="p-2 text-xs font-semibold text-gray-500 text-center uppercase tracking-wider">TPU Implementation</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {rows.map((row, idx) => (
+                <tr key={idx} className="divide-x divide-gray-200">
+                  <td className={`p-0 align-top ${getBgColor(row.left.type)}`}>
+                    <div className="flex min-w-max h-full">
+                      <LineNumber num={row.left.lineNumber} />
+                      <CodeContent content={row.left.content} type={row.left.type} />
+                    </div>
+                  </td>
+                  <td className={`p-0 align-top ${getBgColor(row.right.type)}`}>
+                    <div className="flex min-w-max h-full">
+                      <LineNumber num={row.right.lineNumber} />
+                      <CodeContent content={row.right.content} type={row.right.type} />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
