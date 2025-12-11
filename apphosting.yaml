@@ -1,0 +1,3 @@
+env:
+  - variable: API_KEY
+    secret: API_KEY
