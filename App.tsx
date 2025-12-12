@@ -35,14 +35,15 @@ const App: React.FC = () => {
   }, [gpuCode, tpuCode]);
 
   const handleGenerate = async () => {
-    if (!process.env.API_KEY) {
-      alert("API Key not found. Please ensure the API_KEY environment variable is set.");
+    const apiKey = import.meta.env.VITE_API_KEY;
+    if (!apiKey) {
+      alert("API Key not found. Please ensure the VITE_API_KEY environment variable is set.");
       return;
     }
 
     setIsGenerating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const prompt = `
         You are an expert AI engineer specializing in migrating GPU workloads (PyTorch, TensorFlow) to Google Cloud TPU.
         

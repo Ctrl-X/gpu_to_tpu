@@ -1,5 +1,5 @@
-import { diffLines, Change } from 'diff';
-import { DiffRow, DiffLine, DiffType } from '../types';
+import { diffLines } from 'diff';
+import { DiffRow } from '../types';
 
 export const generateDiffRows = (oldText: string, newText: string): DiffRow[] => {
   const changes = diffLines(oldText, newText, { newlineIsToken: false });
@@ -12,7 +12,7 @@ export const generateDiffRows = (oldText: string, newText: string): DiffRow[] =>
   // A simple strategy: Iterate changes. 
   // If removed, put on left. If added, put on right. 
   // If we have a block of removed followed by added (or vice versa), align them.
-  
+
   let i = 0;
   while (i < changes.length) {
     const change = changes[i];
@@ -35,8 +35,8 @@ export const generateDiffRows = (oldText: string, newText: string): DiffRow[] =>
       const current = change;
       const next = i + 1 < changes.length ? changes[i + 1] : null;
 
-      const isReplacement = 
-        (current.removed && next?.added) || 
+      const isReplacement =
+        (current.removed && next?.added) ||
         (current.added && next?.removed);
 
       if (isReplacement && next) {
@@ -57,11 +57,11 @@ export const generateDiffRows = (oldText: string, newText: string): DiffRow[] =>
           const rightContent = addedLines[j];
 
           rows.push({
-            left: leftContent !== undefined 
-              ? { lineNumber: leftLineNum++, content: leftContent, type: 'removed' } 
+            left: leftContent !== undefined
+              ? { lineNumber: leftLineNum++, content: leftContent, type: 'removed' }
               : { lineNumber: null, content: '', type: 'empty' },
-            right: rightContent !== undefined 
-              ? { lineNumber: rightLineNum++, content: rightContent, type: 'added' } 
+            right: rightContent !== undefined
+              ? { lineNumber: rightLineNum++, content: rightContent, type: 'added' }
               : { lineNumber: null, content: '', type: 'empty' },
           });
         }
@@ -73,15 +73,15 @@ export const generateDiffRows = (oldText: string, newText: string): DiffRow[] =>
 
         for (const line of lines) {
           if (change.removed) {
-             rows.push({
-               left: { lineNumber: leftLineNum++, content: line, type: 'removed' },
-               right: { lineNumber: null, content: '', type: 'empty' },
-             });
+            rows.push({
+              left: { lineNumber: leftLineNum++, content: line, type: 'removed' },
+              right: { lineNumber: null, content: '', type: 'empty' },
+            });
           } else {
-             rows.push({
-               left: { lineNumber: null, content: '', type: 'empty' },
-               right: { lineNumber: rightLineNum++, content: line, type: 'added' },
-             });
+            rows.push({
+              left: { lineNumber: null, content: '', type: 'empty' },
+              right: { lineNumber: rightLineNum++, content: line, type: 'added' },
+            });
           }
         }
         i++;
