@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -27,11 +28,11 @@ app.post('/api/generate', async (req, res) => {
 
         const ai = new GoogleGenAI({ apiKey: API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-3-pro-preview',
             contents: prompt,
         });
 
-        const generatedCode = response.text();
+        const generatedCode = response.text;
         res.json({ generatedCode });
 
     } catch (error) {
@@ -41,7 +42,7 @@ app.post('/api/generate', async (req, res) => {
 });
 
 // Catch-all handler to serve index.html for client-side routing
-app.get('*', (req, res) => {
+app.use((req, res) => {
     res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
