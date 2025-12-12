@@ -5,7 +5,7 @@ import AssessmentForm from './components/AssessmentForm';
 import DiffViewer from './components/DiffViewer';
 import { TEMPLATES } from './constants';
 import { generateDiffRows } from './utils/diffGenerator';
-import { GoogleGenAI } from "@google/genai";
+
 
 const App: React.FC = () => {
   // State for the selected template. Default to the first one.
@@ -35,14 +35,8 @@ const App: React.FC = () => {
   }, [gpuCode, tpuCode]);
 
   const handleGenerate = async () => {
-    if (!process.env.API_KEY) {
-      alert("API Key not found. Please ensure the API_KEY environment variable is set.");
-      return;
-    }
-
     setIsGenerating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const prompt = `
         You are an expert AI engineer specializing in migrating GPU workloads (PyTorch, TensorFlow) to Google Cloud TPU.
         
@@ -58,15 +52,23 @@ const App: React.FC = () => {
         ${gpuCode}
       `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: prompt,
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
       });
 
-      const generatedCode = response.text;
+      if (!response.ok) {
+        throw new Error('Failed to generate code');
+      }
+
+      const data = await response.json();
+      const generatedCode = data.generatedCode;
 
       if (generatedCode) {
-        // Clean up any potential markdown fences if the model ignores the rule
+        // Clean up any potential markdown fences if the model still returns them (backend should handle this too, but safety first)
         const cleanCode = generatedCode.replace(/^```[a-z]*\n/i, '').replace(/\n```$/, '');
         setTpuCode(cleanCode);
         setIsEditing(false); // Switch back to diff view to show the result
