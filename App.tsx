@@ -35,9 +35,9 @@ const App: React.FC = () => {
   }, [gpuCode, tpuCode]);
 
   const handleGenerate = async () => {
-    const apiKey = import.meta.env.VITE_API_KEY;
+    const apiKey = import.meta.env.API_KEY;
     if (!apiKey) {
-      alert("API Key not found. Please ensure the VITE_API_KEY environment variable is set.");
+      alert("API Key not found. Please ensure the API_KEY environment variable is set.");
       return;
     }
 
@@ -65,7 +65,7 @@ const App: React.FC = () => {
       });
 
       const generatedCode = response.text;
-      
+
       if (generatedCode) {
         // Clean up any potential markdown fences if the model ignores the rule
         const cleanCode = generatedCode.replace(/^```[a-z]*\n/i, '').replace(/\n```$/, '');
@@ -83,10 +83,10 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* 1. Configuration & Header */}
-      <Header 
-        templates={TEMPLATES} 
-        selectedId={selectedTemplateId} 
-        onSelect={setSelectedTemplateId} 
+      <Header
+        templates={TEMPLATES}
+        selectedId={selectedTemplateId}
+        onSelect={setSelectedTemplateId}
       />
 
       <main className="flex-grow pb-12">
@@ -97,8 +97,8 @@ const App: React.FC = () => {
         <AssessmentForm />
 
         {/* 4. The Diff View (Main Feature) */}
-        <DiffViewer 
-          rows={diffRows} 
+        <DiffViewer
+          rows={diffRows}
           filename={currentTemplate.filename}
           tips={currentTemplate.tips}
           gpuCode={gpuCode}
