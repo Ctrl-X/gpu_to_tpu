@@ -32,8 +32,32 @@ app.post('/api/generate', async (req, res) => {
             contents: prompt,
         });
 
-        const generatedCode = response.text;
-        res.json({ generatedCode });
+        const initialCode = response.text;
+
+        // Step 2: Verify and Fix
+        const verificationPrompt = `
+        You are an expert Python/TPU code reviewer.
+        Review the following code which was migrated from GPU to TPU.
+        Check for:
+        1. Compilation errors.
+        2. Correct usage of TPU libraries (torch_xla, tf.distribute.TPUStrategy).
+        3. Logical correctness.
+
+        If there are errors, fix them.
+        Return ONLY the corrected code (no markdown, no explanations).
+        If the code is already correct, return it as is.
+
+        Code to verify:
+        ${initialCode}
+        `;
+
+        const verificationResponse = await ai.models.generateContent({
+            model: 'gemini-3-pro-preview',
+            contents: verificationPrompt,
+        });
+
+        const verifiedCode = verificationResponse.text;
+        res.json({ generatedCode: verifiedCode });
 
     } catch (error) {
         console.error('Error generating content:', error);

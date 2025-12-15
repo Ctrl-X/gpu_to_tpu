@@ -7,6 +7,7 @@ interface MetricsBannerProps {
 }
 
 const MetricsBanner: React.FC<MetricsBannerProps> = ({ metrics }) => {
+  console.log('MetricsBanner props:', metrics);
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200">

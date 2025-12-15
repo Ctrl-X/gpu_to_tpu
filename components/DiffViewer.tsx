@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { FileCode, Lightbulb, Edit3, Wand2, Loader2, Save } from 'lucide-react';
+import { FileCode, Lightbulb, Edit3, Wand2, Loader2 } from 'lucide-react';
 import { DiffRow, DiffType, DiffLine } from '../types';
 
 interface DiffViewerProps {
@@ -106,20 +106,41 @@ const DiffViewer: React.FC<DiffViewerProps> = ({
         <div className="w-1/2 flex flex-col min-w-0 border-r border-gray-200 relative">
           <div className="p-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
             <span className="uppercase tracking-wider">GPU Implementation</span>
-            <button
-              onClick={onToggleEdit}
-              className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors ${isEditing ? 'bg-blue-100 text-blue-700' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
-            >
-              {isEditing ? (
-                <>
-                  <Save className="h-3 w-3" /> Done
-                </>
-              ) : (
-                <>
-                  <Edit3 className="h-3 w-3" /> Edit Code
-                </>
+            <div className="flex gap-2">
+              {isEditing && (
+                <button
+                  onClick={onToggleEdit}
+                  disabled={isGenerating}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Cancel
+                </button>
               )}
-            </button>
+              <button
+                onClick={isEditing ? onGenerate : onToggleEdit}
+                disabled={isEditing && isGenerating}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${isEditing
+                    ? 'bg-google-blue text-white hover:bg-google-blueHover disabled:opacity-50 disabled:cursor-not-allowed shadow-sm font-bold'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+              >
+                {isEditing ? (
+                  isGenerating ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" /> Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-3 w-3" /> Generate TPU Code
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Edit3 className="h-3 w-3" /> Edit Code
+                  </>
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex-grow overflow-auto bg-white">
             {isEditing ? (
@@ -144,20 +165,6 @@ const DiffViewer: React.FC<DiffViewerProps> = ({
         <div className="w-1/2 flex flex-col min-w-0 bg-gray-50/30">
           <div className="p-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
             <span className="uppercase tracking-wider">TPU Implementation</span>
-            {isEditing && (
-              <button
-                onClick={onGenerate}
-                disabled={isGenerating}
-                className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold text-white bg-google-blue hover:bg-google-blueHover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-              >
-                {isGenerating ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Wand2 className="h-3 w-3" />
-                )}
-                Generate TPU Code
-              </button>
-            )}
           </div>
           <div className="flex-grow overflow-auto">
             {isEditing ? (
